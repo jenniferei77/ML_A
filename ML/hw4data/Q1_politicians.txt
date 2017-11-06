@@ -1,0 +1,3 @@
+Q1
+
+The most useful variables in the policial party data will be Export_south_africa in order to tell if the person is a democrat and Superfund_right_to_sue in order to tell if the person is a republican. The Export_south_africa issue only has one 'no' answer recorded by a democrat, and the Superfund_right_to_sue issue only has two 'no' answers recorded by republicans. Although the opposite cannot be said (all yes from republicans or all yes from democrats), these two variables will help predict results in a decision tree format. 

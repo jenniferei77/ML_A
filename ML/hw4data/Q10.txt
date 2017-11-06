@@ -1,0 +1,1 @@
+The politician dataset should be more accurate on the training data than the education dataset. The education dataset should be more accurate on the testing data. 

@@ -1,0 +1,13 @@
+buying,maint,doors,person,boot,safety,class
+expensive,high,Two,MoreThanTwo,large,low,no
+cheap,low,MoreThanTwo,MoreThanTwo,large,high,no
+expensive,low,Two,MoreThanTwo,small,low,no
+expensive,high,Two,MoreThanTwo,small,low,no
+cheap,low,MoreThanTwo,Two,large,high,yes
+cheap,high,MoreThanTwo,MoreThanTwo,large,low,no
+cheap,low,MoreThanTwo,MoreThanTwo,large,high,no
+expensive,high,Two,Two,small,high,yes
+expensive,low,MoreThanTwo,Two,large,low,yes
+cheap,high,Two,Two,small,high,no
+cheap,low,MoreThanTwo,Two,small,high,yes
+cheap,low,Two,Two,small,high,no

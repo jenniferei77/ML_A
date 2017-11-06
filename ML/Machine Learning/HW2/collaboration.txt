@@ -1,0 +1,5 @@
+Did you receive any help whatsoever from anyone in solving this assignment?: Collaborated with Andrew Wong, Adam Driscoll, Karsh Tharyani, and David Robinson to discuss the concepts of Find-S algorithm as explained in the notes/textbook, Version Space, and voting in particular. Went to office hours to further understand the implementation of the List-then-eliminate algorithm. 
+
+Did you give any help whatsoever to anyone in solving this assignment? Yes, explained my understanding of the concepts discussed above, particularly Find-S, that I gathered from lecture/textbook
+
+Did you find or come across code that implements any part of this assignment? Yes, I looked up some syntax on https://docs.python.org/2.7/contents.html to double check the functionalities of "{ : }".format() and writing to a file with open('file",'w').

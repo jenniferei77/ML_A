@@ -1,0 +1,5 @@
+Did you receive any help whatsoever from anyone in solving this assignment?: No
+
+Did you give any help whatsoever to anyone in solving this assignment? No
+
+Did you find or come across code that implements any part of this assignment? Yes, I looked up how to use the input file from the linux run command (in this case, example.txt) and import it into the python script. The specific lines I learned from https://unix.stackexchange.com/questions/209173/invoke-python-script-through-make-command were: "import sys", "infile = sys.argv[1]". I tried not to look at stackexchange, but I could not find any other helpful sources. I also looked up some syntax on https://docs.python.org/2.7/contents.html just to double check the functionalities of " ".join(list) and list.append(variable).

@@ -1,0 +1,5 @@
+1.) Yes, I received help from Adam Driscoll on gain clarification as the tree gets larger. I also got help from Andrew Wong on clarifications about what the error actually means from the data. 
+
+2.) No, I did not give help to anyone. 
+
+3.) Yes, I double checked how to remove white space from a string and also how to replace index values from a list. https://docs.python.org/2.7/contents.html

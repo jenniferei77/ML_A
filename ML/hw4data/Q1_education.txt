@@ -1,0 +1,1 @@
+The valuable education variables are more difficult to predict, since they are very scattered in terms of nonA and A results. Based off of the data, the final is the most telling attribute for if the student receives an A. The other attribute that may be valuable is M4, since only eight nonA students received an A. 
