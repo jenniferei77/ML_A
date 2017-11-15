@@ -86,9 +86,20 @@ def classify_naive(Pvj, Pwv):
     vNB = log(Pvj) + sum(vals)
     return vNB
 
+def remove_stops(Text, stops):
+    Text_new = []
+    for word in list(Text):
+        if word in stops:
+            True
+        else:
+            Text_new += [word]
+    return Text_new
+
 def main():
     split_train = argv[1]
     split_test = argv[2]
+    N = argv[3]
+    N = int(N)
     libs = []
     cons = []
     count = 0
@@ -113,26 +124,36 @@ def main():
         Textl = Textj(libs)
         Textc = Textj(cons)
 
+        #remove stop words
+        nk_both = find_nk(train_examps)
+        nk_both = sorted(nk_both.items(), key=lambda x: x[1], reverse=True)
+        stop_words = []
+        for i in range(N):
+            pair = nk_both[i]
+            stop_words += [pair[0]]
+        lib_words = remove_stops(Textl, stop_words)
+        cons_words = remove_stops(Textc, stop_words)
+        #train_examps = remove_stops(test_examps, stop_words)
+
         #form n, total number of distinct word positions in Textj
-        uniq_L = distinct(Textl)
-        uniq_C = distinct(Textc)
-
-        nl = len(Textl)
-        nc = len(Textc)
-
-        distincts = set(train_examps)
-        vocab = len(distincts)
+        nl = len(lib_words)
+        nc = len(cons_words)
 
         #Number of times word wk occurs in Textj
-        nk_l = find_nk(Textl)
-        nk_c = find_nk(Textc)
+        nk_l = find_nk(lib_words)
+        nk_c = find_nk(cons_words)
         nk_l, nk_c = diff_words(nk_l, nk_c)
 
+        #Number of words in both libs and conservatives
+        distincts = set(train_examps)
+        vocab = len(distincts) - N
 
         #Calculate P(wk|vj)
         PwvL = prop_wkvj(nk_l, nl, vocab)
         PwvC = prop_wkvj(nk_c, nc, vocab)
 
+        PwvL_vals = sorted(PwvL.items(), key=lambda x:x[1], reverse=True)
+        PwvC_vals = sorted(PwvC.items(), key=lambda x:x[1], reverse=True)
 
 
     with open(split_test, 'rb') as testing:

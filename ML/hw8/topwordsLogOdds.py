@@ -88,7 +88,6 @@ def classify_naive(Pvj, Pwv):
 
 def main():
     split_train = argv[1]
-    split_test = argv[2]
     libs = []
     cons = []
     count = 0
@@ -114,9 +113,6 @@ def main():
         Textc = Textj(cons)
 
         #form n, total number of distinct word positions in Textj
-        uniq_L = distinct(Textl)
-        uniq_C = distinct(Textc)
-
         nl = len(Textl)
         nc = len(Textc)
 
@@ -128,56 +124,31 @@ def main():
         nk_c = find_nk(Textc)
         nk_l, nk_c = diff_words(nk_l, nk_c)
 
-
         #Calculate P(wk|vj)
         PwvL = prop_wkvj(nk_l, nl, vocab)
         PwvC = prop_wkvj(nk_c, nc, vocab)
 
+        #Log Odds
+        oddsL = {}
+        oddsC = {}
+        for key in PwvL:
+            oddsL[key] = log(PwvL[key]/PwvC[key])
 
+        for key in PwvC:
+            oddsC[key] = log(PwvC[key]/PwvL[key])
 
-    with open(split_test, 'rb') as testing:
-        testing = csv.reader(testing, delimiter='\n', quotechar='|')
-        tests = []
-        test_examps = []
-        libs_test = []
-        cons_test = []
-        for row in testing:
-            tests += row
-            test_exs, vj = open_each(row[0])
-            test_examps += [test_exs]
-            if vj == 1:
-                libs_test += [test_exs]
-            else:
-                cons_test += [test_exs]
+        #print PwvL.keys()
+        PwvL_vals = sorted(oddsL.items(), key=lambda x:x[1], reverse=True)
+        PwvC_vals = sorted(oddsC.items(), key=lambda x:x[1], reverse=True)
 
+        #print PwvL_vals
+        for i in range(20):
+            pairL = PwvL_vals[i]
+            print "%s %.4f" % (pairL[0], pairL[1])
 
-        misclass = 0
-        for i in range(len(test_examps)):
-            vj = target_val(tests[i])
-            test_file = test_examps[i]
-            libs_prob = []
-            cons_prob = []
-
-            for k in range(len(test_file)):
-                if test_file[k] in PwvL:
-                    libs_prob += [PwvL[test_file[k]]]
-                if test_file[k] in PwvC:
-                    cons_prob += [PwvC[test_file[k]]]
-            vNB_l = classify_naive(Pvj_l, libs_prob)
-            vNB_c = classify_naive(Pvj_c, cons_prob)
-
-            if vNB_l > vNB_c:
-                print "L"
-                if vj == 0:
-                    misclass += 1
-            else:
-                print "C"
-                if vj == 1:
-                    misclass += 1
-
-        accuracy = 1 - (float(misclass)/len(test_examps))
-        print "Accuracy: %.4f" % accuracy
-
-
+        print ""
+        for i in range(20):
+            pairC = PwvC_vals[i]
+            print "%s %.4f" % (pairC[0], pairC[1])
 
 main()

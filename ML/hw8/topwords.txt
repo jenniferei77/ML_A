@@ -1,0 +1,1 @@
+The two lists of words are very similar with many overlapping words. Most of these words are conjunctions, pronouns, etc. that are very common in both writing and speaking. 

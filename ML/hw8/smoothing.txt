@@ -1,0 +1,1 @@
+Smaller q's will improve the classifier until q=0. When q=0, the log will be undefined. 

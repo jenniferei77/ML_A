@@ -1,0 +1,5 @@
+Yes, Andrew Wong helped to clarify some of the instructions that I had previously misinterpreted, such as for nk, vocabulary, and log odds. 
+
+No, I did not provide any help. 
+
+Yes, I found code on stack overflow that discusses the sorting of a dictionary and the lambda variable used for the sort function. https://stackoverflow.com/questions/8966538/syntax-behind-sortedkey-lambda

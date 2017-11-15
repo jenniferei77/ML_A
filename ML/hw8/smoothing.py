@@ -72,26 +72,33 @@ def find_nk(Textj):
 
     return word_freq
 
-def prop_wkvj(nk, n, vocab):
+def prop_wkvj(nk, n, vocab, q):
     Pwk_vj = {}
     for key in nk:
-        Pwk_vj[key] = float(nk[key]+1)/(n+vocab)
+        Pwk_vj[key] = (nk[key]+q)/(n+q*float(vocab))
+        if nk[key] <= 0:
+            #print nk[key]
+            Pwk_vj[key] = (0.0001 + q) / (n + q * float(vocab))
+            #print Pwk_vj[key]
     return Pwk_vj
 
 def classify_naive(Pvj, Pwv):
     vals = []
+    #print Pwv
+    #print Pwv['the']
     for i in range(len(Pwv)):
+        #print Pwv[i]
         vals += [log(Pwv[i])]
-    #print vals
     vNB = log(Pvj) + sum(vals)
     return vNB
 
 def main():
     split_train = argv[1]
     split_test = argv[2]
+    q = argv[3]
+    q = float(q)
     libs = []
     cons = []
-    count = 0
     with open(split_train, 'rb') as training:
         training = csv.reader(training, delimiter='\n', quotechar='|')
         trains = []
@@ -114,9 +121,6 @@ def main():
         Textc = Textj(cons)
 
         #form n, total number of distinct word positions in Textj
-        uniq_L = distinct(Textl)
-        uniq_C = distinct(Textc)
-
         nl = len(Textl)
         nc = len(Textc)
 
@@ -130,8 +134,8 @@ def main():
 
 
         #Calculate P(wk|vj)
-        PwvL = prop_wkvj(nk_l, nl, vocab)
-        PwvC = prop_wkvj(nk_c, nc, vocab)
+        PwvL = prop_wkvj(nk_l, nl, vocab, q)
+        PwvC = prop_wkvj(nk_c, nc, vocab, q)
 
 
 
@@ -163,6 +167,12 @@ def main():
                     libs_prob += [PwvL[test_file[k]]]
                 if test_file[k] in PwvC:
                     cons_prob += [PwvC[test_file[k]]]
+
+            for i in libs_prob:
+                if i <= 0:
+                    #print i
+                    True
+
             vNB_l = classify_naive(Pvj_l, libs_prob)
             vNB_c = classify_naive(Pvj_c, cons_prob)
 
