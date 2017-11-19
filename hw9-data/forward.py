@@ -13,64 +13,46 @@ def get_alphas_init(pi, b, lines):
     #alphas_init = []
     for sent in lines:
         alphas_init[sent[0]] = {}
-        # for key, value in b.items():
-        #     state_probs = value
-        #     #print state_probs
-        #     for key in state_probs:
-        #         b_key = key
-        #         #print pi[pi_key], b[pi_key][b_key]
-        #         alphas_init[pi_key][b_key] = pi[pi_key] * b[pi_key][b_key]
         for key in pi:
             pi_key = key
             alphas_init[sent[0]][pi_key] = pi[pi_key]*b[pi_key][sent[0]]
-
-        # for sent in lines:
-        #     alpha_sent = []
-        #     for word in sent:
-        #         alpha_word = pi[pi_key]*b[pi_key][word]
-        #         alpha_sent += [word, alpha_word]
-        #     alpha_state += [alpha_sent]
-        # alphas_init += [alpha_state]
-    #print alphas_init
+    print alphas_init
     return alphas_init
-
-# def summation():
-#      for
 
 
 def get_alphas(alphas_init, sentence, trans, b):
     alphas = {}
-    alphas[sentence[0]] = {}
     word = sentence
     keys = trans.keys()
     #print keys
+    num = 0
     for i in range(len(sentence)):
         alphtj = []
-        alphas[word[i]] = {}
+        word_num = str(num)
+        alphas[word_num] = {}
+        aji = []
         for alph_key in keys:
             if i == 0:
-                alphas[word[i]][alph_key] = alphas_init[word[i]][alph_key]
+                alphas[word_num][alph_key] = alphas_init[word[i]][alph_key]
+                #print alphas
             else:
-                print word[i-1], alph_key, alphas[word[i-1]], b[alph_key][word[i-1]]
-                alphtj += [alphas[word[i-1]][alph_key]]
-                aji = []
-                for trans_key in keys:
-                    aji += [trans[alph_key][trans_key]]
+                #print alph_key, alphas[word_num][alph_key], b[alph_key][word[i-1]]
+                alphtj += [alphas[str(num-1)][alph_key]]
+                aji += [trans[alph_key][keys[i-1]]]
 
         if i > 0:
             logs = []
-            for j in range(len(alphtj)-1):
+            for j in range(len(alphtj)):
                 #logs += [log_sum(alphtj[j], aji[j])]
                 logs += [alphtj[j]*aji[j]]
             sumj = sum(logs)
             for key in trans:
                 alph_key = key
-                alphas[word[i]][alph_key] = b[alph_key][word[i]]*sumj
-
+                alphas[word_num][alph_key] = b[alph_key][word[i]]*sumj
+        num += 1
     prob_sum = 0
     for val in keys:
-        prob_sum += alphas[word[i]][val]
-
+        prob_sum += alphas[word_num][val]
     return alphas, prob_sum
 
 def main():
@@ -109,7 +91,6 @@ def main():
         ems = {}
         for row in em_probs:
             row = row[0].split(' ')
-            #del row[-1]
             full = []
             for word in row:
                 full += word.split(':')
@@ -140,7 +121,8 @@ def main():
     sentence = lines[0]
     for sentence in lines:
         alphas, prob_sum = get_alphas(alphas_init, sentence, state_trans, ems)
-        print prob_sum
+
+        print log(prob_sum)
 
 
 
