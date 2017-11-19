@@ -6,36 +6,36 @@ import csv
 from math import *
 from logsum import log_sum
 
-def get_alphas_init(pi, b, lines):
-    alphas_init = {}
-    #alphas_init = []
+def get_betas_init(pi, b, lines):
+    betas_init = {}
+    #betas_init = []
     for sent in lines:
-        alphas_init[sent[0]] = {}
+        betas_init[sent[0]] = {}
         for key in pi:
             pi_key = key
-            alphas_init[sent[0]][pi_key] = pi[pi_key]*b[pi_key][sent[0]]
-    #print alphas_init
-    return alphas_init
+            betas_init[sent[0]][pi_key] = pi[pi_key]*b[pi_key][sent[0]]
+    #print betas_init
+    return betas_init
 
-def get_alphas(alphas_init, sentence, trans, b):
-    alphas = {}
+def get_betas(betas_init, sentence, trans, b):
+    betas = {}
     word = sentence
     keys = trans.keys()
     #print keys
     num = 0
     for i in range(len(sentence)):
-        alphtj = []
+        betasj = []
         word_num = str(num)
-        alphas[word_num] = {}
+        betas[word_num] = {}
         aji = []
         bs = []
         for w in range(len(keys)):
             if i == 0:
-                alphas[word_num][keys[w]] = alphas_init[word[i]][keys[w]]
-                #print alphas
+                betas[word_num][keys[w]] = betas_init[word[i]][keys[w]]
+                #print betas
             else:
-                #print alph_key, alphas[word_num][alph_key], b[alph_key][word[i-1]]
-                alphtj += [alphas[str(num-1)][keys[w]]]
+                #print alph_key, betas[word_num][alph_key], b[alph_key][word[i-1]]
+                alphtj += [betas[str(num-1)][keys[w]]]
                 aji += [trans[keys[w]][keys[w-1]]]
 
         if i > 0:
@@ -47,13 +47,13 @@ def get_alphas(alphas_init, sentence, trans, b):
 
             for key in keys:
                 bs += [b[key][word[i]]]
-                alphas[word_num][key] = b[key][word[i]]*sumj
+                betas[word_num][key] = b[key][word[i]]*sumj
 
         num += 1
     prob_sum = 0
     for val in keys:
-        prob_sum += alphas[word_num][val]
-    return alphas, prob_sum
+        prob_sum += betas[word_num][val]
+    return betas, prob_sum
 
 def main():
     dev_file = argv[1]        #possible symbols in vocabulary? (V = {o0,o1,...oM-1})
@@ -109,9 +109,9 @@ def main():
             inits[split[0]] = float(split[1])
         #print inits
 
-    alphas_init = get_alphas_init(inits, ems, lines)
+    betas_init = get_betas_init(inits, ems, lines)
     for sentence in lines:
-        alphas, prob_sum = get_alphas(alphas_init, sentence, state_trans, ems)
+        betas, prob_sum = get_betas(betas_init, sentence, state_trans, ems)
 
         print log(prob_sum)
 
