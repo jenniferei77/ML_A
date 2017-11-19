@@ -43,13 +43,10 @@ def get_alphas(alphas_init, sentence, trans, b):
                     else:
                         sumj = log_sum(sumj, alphtj + log(aji))
             if w > 0:
-                #print keys[si], sentence[w], b[keys[si]][sentence[w]], alphtj, aji, logs, sumj
-                alphas[si][w] = b[keys[si]][sentence[w]]*sumj
+                #print keys[si], sentence[w], b[keys[si]][sentence[w]], alphtj, aji, sumj
+                alphas[si][w] = log(b[keys[si]][sentence[w]])+ sumj
                 bs += [b[keys[si]][sentence[w]]]
 
-    # for w in range(1, w-1):
-    #     for s in range(state):
-    #         alphas[s][w] = b[keys[s]][sentence[w]]*sumj
 
     #print alphas
     prob_sum = 0
@@ -57,7 +54,7 @@ def get_alphas(alphas_init, sentence, trans, b):
         if prob_sum == 0:
             prob_sum = alphas[val][w]
         else:
-            prob_sum += alphas[val][w]
+            prob_sum = log_sum(prob_sum, alphas[val][w])
     return alphas, prob_sum
 
 def main():
