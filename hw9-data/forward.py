@@ -8,52 +8,40 @@ from logsum import log_sum
 
 def get_alphas_init(pi, b, lines):
     alphas_init = {}
-    #alphas_init = []
     for sent in lines:
         alphas_init[sent[0]] = {}
         for key in pi:
             pi_key = key
-            alphas_init[sent[0]][pi_key] = pi[pi_key]*b[pi_key][sent[0]]
-    #print alphas_init
+            alphas_init[sent[0]][pi_key] = log(pi[pi_key])+log(b[pi_key][sent[0]])
     return alphas_init
 
 def get_alphas(alphas_init, sentence, trans, b):
-    alphas = {}
-    word = sentence
+    word = len(sentence)
+    state = len(trans.keys())
+    alphas = [[0 for x in range(word)] for y in range(state)]
     keys = trans.keys()
-    #print keys
-    num = 0
-    for i in range(len(sentence)):
-        alphtj = []
-        word_num = str(num)
-        alphas[word_num] = {}
-        aji = []
-        bs = []
-        for w in range(len(keys)):
-            if i == 0:
-                alphas[word_num][keys[w]] = alphas_init[word[i]][keys[w]]
-                #print alphas
-            else:
-                #print alph_key, alphas[word_num][alph_key], b[alph_key][word[i-1]]
-                alphtj += [alphas[str(num-1)][keys[w]]]
-                aji += [trans[keys[w]][keys[w-1]]]
-
-        if i > 0:
-            logs = []
-            for j in range(len(alphtj)):
-                #logs += [log_sum(alphtj[j], aji[j])]
-                logs += [alphtj[j]*aji[j]]
-            sumj = sum(logs)
-
-            for key in keys:
-                bs += [b[key][word[i]]]
-                alphas[word_num][key] = b[key][word[i]]*sumj
-
-        num += 1
+    for w in range(word):
+        for si in range(state):
+            sumj = 0
+            for sj in range(state):
+                if w == 0:
+                    alphas[sj][w] = alphas_init[sentence[w]][keys[sj]]
+                else:
+                    alphtj = alphas[sj][w-1]
+                    aji = trans[keys[sj]][keys[si]]
+                    if sumj == 0:
+                        sumj = alphtj + log(aji)
+                    else:
+                        sumj = log_sum(sumj, alphtj + log(aji))
+            if w > 0:
+                alphas[si][w] = log(b[keys[si]][sentence[w]]) + sumj
     prob_sum = 0
-    for val in keys:
-        prob_sum += alphas[word_num][val]
-    return alphas, prob_sum
+    for val in range(len(keys)):
+        if prob_sum == 0:
+            prob_sum = alphas[val][w]
+        else:
+            prob_sum = log_sum(prob_sum, alphas[val][w])
+    return prob_sum
 
 def main():
     dev_file = argv[1]        #possible symbols in vocabulary? (V = {o0,o1,...oM-1})
@@ -68,11 +56,9 @@ def main():
             words = row[0].split(' ')
             lines += [words]
 
-
     with open(hmm_trans_file, 'rb') as state_probs:
         state_probs = csv.reader(state_probs, delimiter='\n', quotechar='|')
         state_trans = {}
-
         for row in state_probs:
             row = row[0].split(' ')
             del row[-1]
@@ -84,7 +70,6 @@ def main():
             state_trans[state] = {}
             for i in range(0, len(probs)-1, 2):
                 state_trans[state][probs[i]] = float(probs[i+1])
-        #print state_trans
 
     with open(hmm_emit_file, 'rb') as em_probs:
         em_probs = csv.reader(em_probs, delimiter='\n', quotechar='|')
@@ -94,7 +79,6 @@ def main():
             full = []
             for word in row:
                 full += word.split(':')
-
             probs = full[1:]
             state = full[0]
             ems[state] = {}
@@ -107,13 +91,10 @@ def main():
         for row in init_probs:
             split = row[0].split(' ')
             inits[split[0]] = float(split[1])
-        #print inits
 
     alphas_init = get_alphas_init(inits, ems, lines)
     for sentence in lines:
-        alphas, prob_sum = get_alphas(alphas_init, sentence, state_trans, ems)
+        prob_sum = get_alphas(alphas_init, sentence, state_trans, ems)
 
-        print log(prob_sum)
-
-
+        print prob_sum
 main()
