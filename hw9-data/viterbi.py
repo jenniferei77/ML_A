@@ -6,45 +6,58 @@ import csv
 from math import *
 from logsum import log_sum
 
-def get_betas(pi, sentence, trans, b):
+def get_VPs_init(pi, b, lines):
+    VPs_init = {}
+    for sent in lines:
+        VPs_init[sent[0]] = {}
+        for key in pi:
+            pi_key = key
+            VPs_init[sent[0]][pi_key] = log(pi[pi_key])+log(b[pi_key][sent[0]])
+    return VPs_init
+
+def get_VPs(VPs_init, sentence, trans, b):
     word = len(sentence)
     state = len(trans.keys())
-    betas = [[0 for x in range(word)] for y in range(state)]
+    VPs = [[0 for x in range(word)] for y in range(state)]
+    Qs = [[0 for x in range(word)] for y in range(state)]
+    P_back = []
     keys = trans.keys()
-
-    for w in range(word-1, -1, -1):
+    for w in range(word):
+        maxims_word = []
         for si in range(state):
-            sumj = 0
-            aij_list = []
-            bettj_list = []
+            maxims = []
             for sj in range(state):
-                if w == word-1:
-                    betas[sj][w] = 0
+                if w == 0:
+                    VPs[sj][w] = VPs_init[sentence[w]][keys[sj]]
+                    maxims_word += [VPs[sj][w]]
+                    Qs[sj][w] = sj
+
                 else:
-                    bettj = betas[sj][w+1]
-                    aij = trans[keys[si]][keys[sj]]
-                    aij_list += [aij]
-                    bettj_list += [bettj]
-                    #print log(aij), b[keys[sj]][sentence[w]]
-                    if sumj == 0:
-                        sumj = bettj + log(aij) + log(b[keys[sj]][sentence[w+1]])
-                    else:
-                        sumj = log_sum(sumj, bettj + log(aij) + log(b[keys[sj]][sentence[w+1]]))
-                    # sumj += bettj*aij*b[keys[sj]][sentence[w]]
+                    VPtj = VPs[sj][w-1]
+                    aji = trans[keys[sj]][keys[si]]
+                    maxims += [VPtj + log(aji)]
 
-            if w < word-1:
-                betas[si][w] = sumj
-    prob_sum = 0
-    w = 0
-    for val in range(len(keys)):
-        #print pi[keys[val]], b[keys[val]][sentence[w]], betas[val][w]
-        if prob_sum == 0:
-            prob_sum = log(pi[keys[val]])+log(b[keys[val]][sentence[w]])+betas[val][w]
-        else:
-            prob_sum = log_sum(prob_sum, log(pi[keys[val]])+log(b[keys[val]][sentence[w]])+betas[val][w])
-        # prob_sum += prob_sum*pi[keys[val]]*betas[val][w]
 
-    return prob_sum
+            if w > 0:
+                maxim = max(maxims)
+                print maxim
+                maxim_state = maxims.index(maxim)
+                VPs[si][w] = maxim + log(b[keys[si]][sentence[w]])
+                maxims_word += [VPs[si][w]]
+                Qs[si][w] = maxim_state
+        #print "maxims_word", maxims_word
+    max_VP = max(maxims_word)
+    max_state = maxims_word.index(max_VP)
+    q_path = []
+    q_path += [max_state]
+    #q_path += [Qs[q_path[0]][w]]
+    for w in range(len(sentence)):
+        q_path += [Qs[q_path[w]][len(sentence)-w-1]]
+        P_back += [q_path[w]]
+        key = keys[P_back[w]]
+        sentence[len(sentence)-w-1] = [sentence[len(sentence)-w-1] + '_' + key]
+    print sentence
+    return sentence[w]
 
 def main():
     dev_file = argv[1]        #possible symbols in vocabulary? (V = {o0,o1,...oM-1})
@@ -95,9 +108,9 @@ def main():
             split = row[0].split(' ')
             inits[split[0]] = float(split[1])
 
+    VPs_init = get_VPs_init(inits, ems, lines)
     for sentence in lines:
-        prob_sum = get_betas(inits, sentence, state_trans, ems)
-        print prob_sum
+        prob_sum = get_VPs(VPs_init, sentence, state_trans, ems)
 
 
 main()
